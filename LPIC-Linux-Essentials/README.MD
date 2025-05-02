@@ -1,4 +1,5 @@
 # LPIC Study Resources
+![LPI Logo](../wallpaper/logo_LPI_LE.png "Logo de Linux Professional Institute")
 
 Este repositorio contiene recursos para el estudio de las certificaciones LPIC.
 
