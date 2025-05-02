@@ -1,5 +1,5 @@
 - 📁 **LPIC-Study-Repo/**
-![LPI Logo](https://upload.wikimedia.org/wikipedia/commons/4/45/LPIC.png "Logo de Linux Professional Institute")
+![LPI Logo](./logo.png "Logo de Linux Professional Institute")
     - 📁 **LPIC-Linux-Essentials/**
         - 1. La Comunidad Linux y Carrera en Open Source
             - 1.1 Evolución de Linux y Sistemas Operativos Populares
