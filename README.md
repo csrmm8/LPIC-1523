@@ -1,4 +1,5 @@
 - 📁 **LPIC-Study-Repo/**
+![LPI Logo](https://www.lpi.org/wp-content/webp-express/webp-images/themes/lpi/assets/images/lpi-fb.png.webp "Logo de Linux Professional Institute")
     - 📁 **LPIC-Linux-Essentials/**
         - 1. La Comunidad Linux y Carrera en Open Source
             - 1.1 Evolución de Linux y Sistemas Operativos Populares
@@ -133,6 +134,7 @@
             - 211.3 Filtrar correo electrónico
         - 🔒 Examen 212 - Seguridad del Sistema
             - 212.1 Configurar un router
-            - 212.2 Gestionar un firewall
-            - 212.3 Asegurar servicios
-            - 212.4 Intrusion Detection
+            - 212.2-Administracion_servicores_ftp
+            - 212.3-Secure-shell
+            - 212.4-Tareas_de_seguridad
+            - 212.5-OpenVPN
