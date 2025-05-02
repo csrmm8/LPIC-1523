@@ -1,1 +1,0 @@
-# LPIC Linux Essentials
