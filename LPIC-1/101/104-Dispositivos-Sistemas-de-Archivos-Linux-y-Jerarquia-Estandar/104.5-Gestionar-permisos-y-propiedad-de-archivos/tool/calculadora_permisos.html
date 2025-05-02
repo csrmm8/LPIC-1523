@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calculadora de Permisos UNIX</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      text-align: center;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #eef;
+      border-left: 5px solid #369;
+      font-size: 1.1em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Calculadora de Permisos UNIX</h1>
+    <label for="tipo">Selecciona el tipo de cálculo:</label>
+    <select id="tipo">
+      <option value="octal_a_simbolico">Octal a Simbólico</option>
+      <option value="simbolico_a_octal">Simbólico a Octal</option>
+    </select>
+
+    <label for="modo">¿Incluir bits especiales (SUID/SGID/Sticky)?</label>
+    <select id="modo">
+      <option value="4">Sí (4 dígitos)</option>
+      <option value="3" selected>No (3 dígitos)</option>
+    </select>
+
+    <label id="inputLabel" for="entrada">Ingresa los permisos:</label>
+    <input type="text" id="entrada" placeholder="Ejemplo: 755 o rwxr-xr-x"/>
+
+    <button onclick="convertir()">Convertir</button>
+
+    <div class="result" id="resultado"></div>
+  </div>
+
+  <script>
+    function octalASimbolico(octal) {
+      const bitsEspeciales = {
+        '4': 's', // SUID
+        '2': 's', // SGID
+        '1': 't', // Sticky
+        '0': ''
+      };
+
+      let resultado = '';
+      let digitos = octal.split('');
+      if (digitos.length === 3) {
+        // Sin bits especiales
+        resultado += parsearDigitos(digitos[0], 'u') + parsearDigitos(digitos[1], 'g') + parsearDigitos(digitos[2], 'o');
+      } else if (digitos.length === 4) {
+        // Con bit especial
+        let bitEspecial = bitsEspeciales[digitos[0]] || '';
+        let ugo = parsearDigitos(digitos[1], 'u') + parsearDigitos(digitos[2], 'g') + parsearDigitos(digitos[3], 'o');
+
+        if (bitEspecial && ugo.includes('x')) {
+          ugo = ugo.replace(/(u|x)/, 'X');
+        }
+
+        resultado = ugo;
+      }
+      return resultado;
+    }
+
+    function parsearDigitos(digito, tipo) {
+      let permisos = '';
+      const valor = parseInt(digito, 8);
+
+      permisos += (valor & 4) ? 'r' : '-';
+      permisos += (valor & 2) ? 'w' : '-';
+      if (tipo === 'u' && (valor & 1)) permisos += 'x';
+      else if (tipo === 'g' && (valor & 1)) permisos += ((digito >= 2 && digito <= 3) || (digito >= 6 && digito <= 7)) ? 's' : 'x';
+      else if (tipo === 'o' && (valor & 1)) permisos += ((digito % 2) === 1) ? 't' : 'x';
+      else permisos += '-';
+
+      return permisos;
+    }
+
+    function simbolicoAOctal(simbolico, incluirEspeciales) {
+      const partes = simbolico.match(/^([-r][-w][-xsStT]){3}$/);
+      if (!partes) return "Formato inválido";
+
+      const mapeo = {
+        '---': '0',
+        '--x': '1',
+        '-w-': '2',
+        '-wx': '3',
+        'r--': '4',
+        'r-x': '5',
+        'rw-': '6',
+        'rwx': '7'
+      };
+
+      let owner = simbolico.substring(0,3);
+      let group = simbolico.substring(3,6);
+      let other = simbolico.substring(6,9);
+
+      let octal = mapeo[owner] + mapeo[group] + mapeo[other];
+
+      if (incluirEspeciales) {
+        let special = '0';
+        if (owner.includes('s')) special = '4';
+        else if (group.includes('s')) special = '2';
+        else if (other.includes('t')) special = '1';
+
+        octal = special + octal;
+      }
+
+      return octal;
+    }
+
+    function convertir() {
+      const tipo = document.getElementById("tipo").value;
+      const modo = document.getElementById("modo").value;
+      const entrada = document.getElementById("entrada").value.trim();
+      let resultado = "";
+
+      if (tipo === "octal_a_simbolico") {
+        const regexOctal = modo === "4" ? /^[0-7]{4}$/ : /^[0-7]{3}$/;
+        if (!regexOctal.test(entrada)) {
+          resultado = "Entrada inválida. Debe ser un número octal válido (" + (modo === "4" ? "4 dígitos con bits especiales)" : "3 dígitos sin bits especiales)");
+        } else {
+          resultado = octalASimbolico(entrada);
+        }
+      } else {
+        const regexSimbolico = /^[-r][-w][-xsStT]{3}[-r][-w][-xsStT]{3}[-r][-w][-xsStT]$/;
+        if (!regexSimbolico.test(entrada)) {
+          resultado = "Formato simbólico inválido. Ejemplo: rwxr-xr-x";
+        } else {
+          resultado = simbolicoAOctal(entrada, modo === "4");
+        }
+      }
+
+      document.getElementById("resultado").innerText = "Resultado: " + resultado;
+    }
+  </script>
+</body>
+</html>
