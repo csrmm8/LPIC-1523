@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Explorador Interactivo del FHS (Filesystem Hierarchy Standard)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f7f7f7;
+    }
+    h1 {
+      text-align: center;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    ul {
+      list-style-type: none;
+      padding-left: 20px;
+    }
+    li {
+      cursor: pointer;
+      padding: 5px 0;
+    }
+    .directorio {
+      color: #0366d6;
+      font-weight: bold;
+    }
+    .descripcion {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #f0f0f0;
+      border-left: 4px solid #0366d6;
+      display: none;
+      font-size: 0.95em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Explorador del Sistema de Archivos (FHS)</h1>
+    <p>Haz clic en un directorio para ver su propósito y contenido típico.</p>
+
+    <ul id="fhs-tree">
+      <li class="directorio" data-descripcion="Contiene comandos esenciales disponibles para todos los usuarios.">/bin</li>
+      <li class="directorio" data-descripcion="Contiene comandos esenciales reservados para el superusuario (root).">/sbin</li>
+      <li class="directorio" data-descripcion="Archivos de configuración específicos del sistema.">/etc</li>
+      <li class="directorio" data-descripcion="Programas secundarios y archivos compartidos para usuarios.">/usr</li>
+      <li class="directorio" data-descripcion="Datos variables como registros, colas de correo, bases de datos, etc.">/var</li>
+      <li class="directorio" data-descripcion="Directorios temporales utilizados por aplicaciones y usuarios.">/tmp</li>
+      <li class="directorio" data-descripcion="Paquetes de software adicionales instalados por el administrador.">/opt</li>
+      <li class="directorio" data-descripcion="Información sobre dispositivos del sistema.">/dev</li>
+      <li class="directorio" data-descripcion="Archivos del kernel del sistema operativo.">/boot</li>
+      <li class="directorio" data-descripcion="Puntos de montaje temporales para unidades o sistemas remotos.">/mnt</li>
+      <li class="directorio" data-descripcion="Directorios personales de los usuarios.">/home</li>
+      <li class="directorio" data-descripcion="Bibliotecas esenciales necesarias para ejecutar programas en /bin y /sbin.">/lib</li>
+      <li class="directorio" data-descripcion="Sistema de archivos raíz virtual usado para procesos del kernel.">/proc</li>
+      <li class="directorio" data-descripcion="Archivos relacionados con la ejecución del sistema en tiempo real.">/run</li>
+      <li class="directorio" data-descripcion="Directorios para servicios del sistema.">/srv</li>
+      <li class="directorio" data-descripcion="Archivos temporales persistentes entre reinicios.">/media</li>
+    </ul>
+
+    <div id="descripcion" class="descripcion"></div>
+  </div>
+
+  <script>
+    document.querySelectorAll('.directorio').forEach(item => {
+      item.addEventListener('click', function () {
+        const descripcion = this.getAttribute('data-descripcion');
+        const contenedorDescripcion = document.getElementById('descripcion');
+
+        // Mostrar u ocultar la descripción al hacer clic
+        if (contenedorDescripcion.style.display === 'block' && contenedorDescripcion.innerHTML === descripcion) {
+          contenedorDescripcion.style.display = 'none';
+        } else {
+          contenedorDescripcion.innerHTML = descripcion;
+          contenedorDescripcion.style.display = 'block';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
