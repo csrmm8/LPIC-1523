@@ -7,7 +7,7 @@ Este repositorio contiene recursos para el estudio de las certificaciones LPIC.
 
 * **Hipervisor:** Virtual Box 7
 * **SO:** Linux Mint 22.1
-* **Fuente (src):** [https://drive.google.com/drive/folders/1KKANSazkd3hAHtfvnkl9tGUhVplvZMjJ?usp=sharing](https://drive.google.com/drive/drive/folders/1KKANSazkd3hAHtfvnkl9tGUhVplvZMjJ?usp=sharing)
+* **Fuente (src):** [https://drive.google.com/drive/folders/1KKANSazkd3hAHtfvnkl9tGUhVplvZMjJ?usp=sharing)
 * **Fichero (file):** `LinuxMint_22.ova`
 
 ## Instalación:
