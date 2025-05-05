@@ -1,2 +1,2 @@
 # 1.1-Evolucion-de-Linux-y-Sistemas-Operativos-Populares
-[![Ver Resumen de IA](../../../../../blob/main/LPIC-Linux-Essentials/1-La-Comunidad-Linux-y-Carrera-en-Open-Source/1.1-Evolucion-de-Linux-y-Sistemas-Operativos-Populares/Resumen-IA.pdf)](../../../../../blob/main/LPIC-Linux-Essentials/1-La-Comunidad-Linux-y-Carrera-en-Open-Source/1.1-Evolucion-de-Linux-y-Sistemas-Operativos-Populares/Resumen-IA.pdf)
+[![Ver Resumen de IA](../../../../blob/main/LPIC-Linux-Essentials/1-La-Comunidad-Linux-y-Carrera-en-Open-Source/1.1-Evolucion-de-Linux-y-Sistemas-Operativos-Populares/Resumen-IA.pdf)](../../../../../blob/main/LPIC-Linux-Essentials/1-La-Comunidad-Linux-y-Carrera-en-Open-Source/1.1-Evolucion-de-Linux-y-Sistemas-Operativos-Populares/Resumen-IA.pdf)
