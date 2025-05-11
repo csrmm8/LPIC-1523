@@ -1,0 +1,154 @@
+
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+							<style>
+								body {
+									background-color: white; /* Ensure the iframe has a white background */
+								}
+
+								
+							</style>
+                        </head>
+                        <body>
+                            <!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Selector de Distribuciones GNU/Linux</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      font-size: 1em;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    .info {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #eef;
+      border-left: 6px solid #369;
+      border-radius: 4px;
+      font-size: 0.95em;
+    }
+    .info p {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Selector de Distribuciones GNU/Linux</h1>
+    <label for="distroSelect">Selecciona una distribución:</label>
+    <select id="distroSelect">
+      <option value="">-- Selecciona --</option>
+    </select>
+
+    <div id="distroInfo" class="info">
+      <p><strong>Rama:</strong> -</p>
+      <p><strong>Versión estable:</strong> -</p>
+      <p><strong>Requerimientos mínimos:</strong> -</p>
+    </div>
+  </div>
+
+  <script>
+    const distros = [
+      { name: "Ubuntu", branch: "Debian", version: "24.04 LTS", requirements: "2 GHz CPU, 4 GB RAM, 25 GB HDD" },
+      { name: "Linux Mint", branch: "Ubuntu", version: "21.3", requirements: "1 GHz CPU, 2 GB RAM, 15 GB HDD" },
+      { name: "Fedora", branch: "Red Hat", version: "40", requirements: "2 GHz CPU, 2 GB RAM, 20 GB HDD" },
+      { name: "Debian", branch: "Original", version: "12 (Bookworm)", requirements: "1 GHz CPU, 512 MB RAM, 10 GB HDD" },
+      { name: "Arch Linux", branch: "Original", version: "Rolling Release", requirements: "i686 or x86_64 CPU, 512 MB RAM" },
+      { name: "Manjaro", branch: "Arch", version: "23.1.0", requirements: "i686 or x86_64 CPU, 2 GB RAM" },
+      { name: "openSUSE Leap", branch: "SUSE", version: "15.5", requirements: "2.4 GHz CPU, 2 GB RAM, 10 GB HDD" },
+      { name: "Pop!_OS", branch: "Ubuntu", version: "23.10", requirements: "2 GHz CPU, 4 GB RAM, 20 GB HDD" },
+      { name: "Elementary OS", branch: "Ubuntu", version: "7.0", requirements: "2 GHz CPU, 4 GB RAM, 15 GB HDD" },
+      { name: "Zorin OS", branch: "Ubuntu", version: "16.2", requirements: "2 GHz CPU, 2 GB RAM, 25 GB HDD" },
+      { name: "MX Linux", branch: "Debian", version: "21.4", requirements: "Intel/AMD 1 GHz CPU, 1 GB RAM" },
+      { name: "Solus", branch: "Original", version: "4.4", requirements: "1.6 GHz CPU, 2 GB RAM" },
+      { name: "Kali Linux", branch: "Debian", version: "2024.1", requirements: "2 GHz CPU, 2 GB RAM, 20 GB HDD" },
+      { name: "Tails", branch: "Debian", version: "6.10", requirements: "i7 processor recommended, USB stick" },
+      { name: "EndeavourOS", branch: "Arch", version: "2023.09.01", requirements: "x86_64 CPU, 2 GB RAM" },
+      { name: "Garuda Linux", branch: "Arch", version: "2024.01", requirements: "x86_64 CPU, 2 GB RAM" },
+      { name: "AlmaLinux", branch: "Red Hat", version: "9.2", requirements: "1.6 GHz CPU, 1 GB RAM, 20 GB HDD" },
+      { name: "Rocky Linux", branch: "Red Hat", version: "9.2", requirements: "1.6 GHz CPU, 1 GB RAM, 20 GB HDD" },
+      { name: "Gentoo", branch: "Original", version: "17.1", requirements: "Varies (source-based)" },
+      { name: "Slackware", branch: "Original", version: "15.0", requirements: "Old hardware supported" },
+      { name: "Parrot OS", branch: "Debian", version: "5.3", requirements: "1 GHz CPU, 1 GB RAM" },
+      { name: "Qubes OS", branch: "Fedora / Debian", version: "4.1", requirements: "Intel VT-x or AMD-V capable CPU, 8 GB RAM" },
+      { name: "NixOS", branch: "Original", version: "24.05", requirements: "1 GHz CPU, 512 MB RAM" },
+      { name: "Void Linux", branch: "Original", version: "rolling", requirements: "x86, ARM, 512 MB RAM" },
+      { name: "Alpine Linux", branch: "Original", version: "3.20", requirements: "Very low (can run on embedded systems)" },
+      { name: "Puppy Linux", branch: "Original", version: "9.7", requirements: "Very low (runs in RAM)" },
+      { name: "Bodhi Linux", branch: "Ubuntu", version: "6.1", requirements: "500 MHz CPU, 256 MB RAM" },
+      { name: "Deepin", branch: "Debian", version: "23", requirements: "2 GHz CPU, 2 GB RAM, 60 GB HDD" },
+      { name: "KaOS", branch: "Original", version: "2024.05", requirements: "x86_64 CPU, 2 GB RAM" }
+    ];
+
+    const select = document.getElementById("distroSelect");
+    const infoDiv = document.getElementById("distroInfo");
+
+    // Rellenar el combo con las distribuciones
+    distros.forEach(distro => {
+      const option = document.createElement("option");
+      option.value = distro.name;
+      option.textContent = distro.name;
+      select.appendChild(option);
+    });
+
+    // Mostrar información al seleccionar
+    select.addEventListener("change", () => {
+      const selected = distros.find(d => d.name === select.value);
+      if (selected) {
+        infoDiv.innerHTML = `
+          <p><strong>Rama:</strong> ${selected.branch}</p>
+          <p><strong>Versión estable:</strong> ${selected.version}</p>
+          <p><strong>Requerimientos mínimos:</strong> ${selected.requirements}</p>
+        `;
+      } else {
+        infoDiv.innerHTML = `
+          <p><strong>Rama:</strong> -</p>
+          <p><strong>Versión estable:</strong> -</p>
+          <p><strong>Requerimientos mínimos:</strong> -</p>
+        `;
+      }
+    });
+  </script>
+</body>
+</html>
+
+
+
+							<script>
+                            	
+							</script>
+                        </body>
+                        </html>
+                    
