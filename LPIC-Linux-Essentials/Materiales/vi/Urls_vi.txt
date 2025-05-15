@@ -1,0 +1,18 @@
+Lo + básico
+
+https://www.freecodecamp.org/espanol/news/como-usar-vim-tutorial-para-principiantes/
+https://structio.sourceforge.net/guias/basico_OpenBSD/editor-vi.html
+https://cs.stanford.edu/people/miles/vi.html
+https://www.zeppelinux.es/el-editor-de-texto-vi/
+
+Lo mejoramos ...
+https://github.com/victorhck/Aprende-Vim/tree/master
+
+Gamificación 
+https://vim-adventures.com/
+
+
+
+
+
+
