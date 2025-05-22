@@ -1,0 +1,4 @@
+menuentry "Arrancar desde /dev/hda1 (NO funcionará ;-)" {
+    set root=(hd0,msdos1)
+    chainloader +1
+}
