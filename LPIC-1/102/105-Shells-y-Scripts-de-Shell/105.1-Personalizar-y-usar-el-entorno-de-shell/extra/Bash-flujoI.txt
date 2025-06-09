@@ -1,0 +1,24 @@
+                      +----------------------+
+                      |   Inicia una shell   |
+                      +----------+-----------+
+                                 |
+         ¿Es una Login Shell? --NO--> No se cargan archivos de inicio por defecto
+                                 |
+                                SI
+                                 |
+                 +------------------------------+
+                 | ¿Se usó `--login` o es login?|
+                 +--------------+---------------+
+                                |
+               +----------------+-----------------+
+               |                |                  |
+        Usuario normal       sudo/su -l        Otros casos
+               |                |                  |
+    /etc/profile (si existe)  |     ~/.bash_profile (si existe)
+    ~/.bash_profile           |     ~/.bashrc (opcional)
+    ~/.bash_login             |
+    ~/.profile (último recurso)  
+               |
+    ~/.bashrc (opcional, si se incluye manualmente)
+               |
+    ~/.bash_logout (al cerrar sesión)

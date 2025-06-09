@@ -1,0 +1,15 @@
+                      +----------------------+
+                      |   Shell interactiva  |
+                      |     no-login         |
+                      +----------+-----------+
+                                 |
+            ¿Existe ~/.bashrc? --NO--> No se carga nada
+                                 |
+                                SI
+                                 |
+                        ~/.bashrc se carga
+                                 |
+            ¿Existe /etc/bash.bashrc? --NO--> Fin
+                                 |
+                                SI
+                         /etc/bash.bashrc se carga
