@@ -1,0 +1,4 @@
+1.- Conexión a https://keys.openpgp.org/
+2.- Localiza  ricardo.instructor.formacion@gmail.com
+3.- Descarga el fichero .asc
+4.- CLI: gpg --keyserver keys.openpgp.org --recv-keys DA3E04B8FC13DEA58B8ABC018B4836FA0D74D09E
