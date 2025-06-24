@@ -1,0 +1,25 @@
+Resumen de funciones más utilizadas de NMap
+
+___@___# nmap 192.168.1.0/24		 ⇒ Ver todo lo que hay en una red;
+
+___@___# nmap -O 192.168.1.0/24	 ⇒ Averiguar el SS.OO.;
+
+___@___# nmap -A 192.168.1.0/24	 ⇒ Información detallada de red;
+
+___@___# nmap -sV -O -A 192.168.1.0/24	 ⇒ Info completa de red;
+
+___@___# nmap -T4 -A 192.168.1.0/24	 ⇒ Escaneo intenso (método actual);
+
+___@___# nmap -sS -sU -T4 -A 192.168.1.0/24	 ⇒ Escaneo intenso UDP;
+
+___@___# nmap -p -1-65535 -T4 -A 192.168.1.0/24	 ⇒ Escaneo intenso TCP;
+
+___@___# nmap -T4 -A -Pn 192.168.1.0/24	 ⇒ Escaneo intenso “sin ping”;
+
+___@___# nmap -sn 192.168.1.0/24	 ⇒ Escaneo con “ping”;
+
+___@___# nmap -T4 -F 192.168.1.0/24	 ⇒ Escaneo rápido (-F = rápido);
+
+___@___# nmap -script vuln 192.168.1.0/24 -oX fichero.xml	⇒ Ver vulnerabilidades;
+
+___@___# nmap -sC 192.168.1.0/24 -oX fichero.xml	⇒ Ver vulnerabilidades (igual que el anterior).
