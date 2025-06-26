@@ -23,3 +23,14 @@ ___@___# nmap -T4 -F 192.168.1.0/24	 ⇒ Escaneo rápido (-F = rápido);
 ___@___# nmap -script vuln 192.168.1.0/24 -oX fichero.xml	⇒ Ver vulnerabilidades;
 
 ___@___# nmap -sC 192.168.1.0/24 -oX fichero.xml	⇒ Ver vulnerabilidades (igual que el anterior).
+
+En el apdo 12 la opción -oX fichero.xml redirige la salida de nmap a un fichero .xml, que aunque se utiliza para la generación de informes no es muy manejable... Para generación de informes:
+Generar un informe con NMap
+
+___@___# nmap -T4 -A 192.168.1.0/24 | tee informe.txt  ⇒ Informe de campo, saca el resultado por pantalla y además lo manda al archivo informe.txt.
+
+___@___# nmap -T4 -A 192.168.1.0/24 -oX fichero.xml    ⇒ -oX = salida a fichero xml;
+
+___@___# xsltproc fichero.xml -o .html 			      ⇒ Convierte el xml a html (UBUNTU!!)
+En RedHat el paquete es:
+dnf install libxslt
