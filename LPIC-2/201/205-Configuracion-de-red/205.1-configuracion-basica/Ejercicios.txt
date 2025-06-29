@@ -1,0 +1,382 @@
+﻿
+-----
+
+## Ejercicios con Soluciones: LPIC-2 Objetivo 205.1 - Configuración Básica de Red
+
+**Escenario:** Tienes dos servidores, **`rocky`** (Rocky Linux) y **`ubuntu`** (Ubuntu Server), ambos con el usuario **`curso`** con capacidad `sudo` y acceso `root`. Puedes conectarte a ambos con SSH. Tu objetivo es configurar las interfaces de red para establecer conectividad y simular escenarios de enrutamiento básico.
+
+-----
+
+### Ejercicio 1: Configuración de Interfaces Ethernet (IPv4 e IPv6)
+
+#### 1\. En `rocky` (Rocky Linux):
+
+**Objetivo:** Configurar una IP estática IPv4 y una subinterfaz IPv4 persistentes.
+
+**Solución Paso a Paso:**
+
+1.  **Identificar la interfaz principal:**
+
+      * Conéctate a `rocky`: `ssh curso@rocky`
+      * Ejecuta `ip a` para listar las interfaces. Busca una interfaz Ethernet como `eth0`, `enpXsY` o `ensXsY`. Para este ejemplo, asumiremos `eth0`.
+
+2.  **Crear o modificar el archivo de configuración para la interfaz principal (`eth0`):**
+
+      * Navega al directorio de configuración de red:
+        ```bash
+        cd /etc/sysconfig/network-scripts/
+        ```
+      * Abre o crea el archivo `ifcfg-eth0` (reemplaza `eth0` por tu interfaz real) con `sudo vi` o `sudo nano`:
+        ```bash
+        sudo vi ifcfg-eth0
+        ```
+      * Asegúrate de que el contenido sea similar a esto:
+        ```
+        TYPE=Ethernet
+        BOOTPROTO=none
+        NAME=eth0
+        DEVICE=eth0
+        ONBOOT=yes
+        IPADDR=197.10.10.1
+        PREFIX=24
+        GATEWAY=197.10.10.254
+        DNS1=8.8.8.8
+        # Puedes añadir DNS2 si lo deseas
+        # DNS2=8.8.4.4
+        ```
+      * Guarda y cierra el archivo.
+
+3.  **Crear el archivo de configuración para la subinterfaz (`eth0:0`):**
+
+      * Crea el archivo `ifcfg-eth0:0` con `sudo vi` o `sudo nano`:
+        ```bash
+        sudo vi ifcfg-eth0:0
+        ```
+      * Asegúrate de que el contenido sea similar a esto:
+        ```
+        TYPE=Ethernet
+        BOOTPROTO=none
+        NAME=eth0:0
+        DEVICE=eth0:0
+        ONBOOT=yes
+        IPADDR=197.10.20.1
+        PREFIX=24
+        # No se especifica GATEWAY en subinterfaces a menos que sea una ruta específica.
+        ```
+      * Guarda y cierra el archivo.
+
+4.  **Reiniciar el servicio de red para aplicar los cambios:**
+
+      * En Rocky Linux, puedes usar NetworkManager para recargar las configuraciones:
+        ```bash
+        sudo nmcli connection reload
+        sudo nmcli connection up eth0
+        sudo nmcli connection up eth0:0 # Puede que no sea necesario explícitamente, pero es buena práctica
+        # O, si no usas NetworkManager o para un reinicio más completo:
+        # sudo systemctl restart network
+        ```
+
+5.  **Verificación:**
+
+      * Comprueba las direcciones IP asignadas:
+        ```bash
+        ip a
+        ```
+        Deberías ver `197.10.10.1/24` y `197.10.20.1/24` asociadas a tu interfaz principal o subinterfaz.
+      * Verifica la tabla de enrutamiento:
+        ```bash
+        ip r
+        ```
+        Deberías ver una ruta predeterminada vía `197.10.10.254`.
+      * Comprueba la conectividad al gateway:
+        ```bash
+        ping -c 3 197.10.10.254
+        ```
+
+#### 2\. En `ubuntu` (Ubuntu Server):
+
+**Objetivo:** Configurar una IP estática IPv4 y una IP estática IPv6 persistentes usando Netplan.
+
+**Solución Paso a Paso:**
+
+1.  **Identificar la interfaz principal:**
+
+      * Conéctate a `ubuntu`: `ssh curso@ubuntu`
+      * Ejecuta `ip a`. Asumiremos que tu interfaz es `enp0s3`.
+
+2.  **Editar el archivo de configuración de Netplan:**
+
+      * Los archivos de Netplan se encuentran en `/etc/netplan/`. Generalmente hay un archivo como `00-installer-config.yaml` o similar.
+      * Abre el archivo YAML con `sudo vi` o `sudo nano`:
+        ```bash
+        sudo vi /etc/netplan/00-installer-config.yaml
+        ```
+      * Edita el contenido para que coincida con la configuración deseada. Asegúrate de que la indentación sea correcta (Netplan es sensible a los espacios):
+        ```yaml
+        network:
+          version: 2
+          renderer: networkd
+          ethernets:
+            enp0s3: # Reemplaza con el nombre de tu interfaz real
+              dhcp4: no # Deshabilita DHCP para IPv4
+              dhcp6: no # Deshabilita DHCP para IPv6 si no lo necesitas
+              addresses:
+                - 197.10.10.2/24
+                - 2001:db8:10::2/64
+              routes:
+                - to: default
+                  via: 197.10.10.254
+                - to: default
+                  via: 2001:db8:10::1 # Gateway IPv6
+              nameservers:
+                addresses: [8.8.4.4, 8.8.8.8] # Añade los servidores DNS
+        ```
+      * Guarda y cierra el archivo.
+
+3.  **Aplicar los cambios de Netplan:**
+
+    ```bash
+    sudo netplan apply
+    ```
+
+      * Si hay errores de sintaxis, Netplan te lo indicará. Corrige el archivo y vuelve a intentar.
+
+4.  **Verificación:**
+
+      * Comprueba las direcciones IP asignadas:
+        ```bash
+        ip a
+        ```
+        Deberías ver `197.10.10.2/24` y `2001:db8:10::2/64` en tu interfaz.
+      * Comprueba la tabla de enrutamiento:
+        ```bash
+        ip r
+        ip -6 r
+        ```
+        Deberías ver las rutas predeterminadas para IPv4 e IPv6.
+      * Comprueba la conectividad a los gateways:
+        ```bash
+        ping -c 3 197.10.10.254
+        ping6 -c 3 2001:db8:10::1
+        ```
+
+-----
+
+### Ejercicio 2: Enrutamiento Básico y Comunicación entre Subredes
+
+**Contexto:** Los servidores `rocky` y `ubuntu` están en la misma red `197.10.10.0/24`. `rocky` tiene una subinterfaz en `197.10.20.0/24`. Ahora simulemos que `ubuntu` necesita comunicarse con la red `197.10.20.0/24` a través de `rocky`.
+
+#### 1\. En `rocky` (Rocky Linux):
+
+**Objetivo:** Activar el reenvío de paquetes IPv4 de forma permanente.
+
+**Solución Paso a Paso:**
+
+1.  **Editar el archivo de configuración de `sysctl`:**
+
+      * Conéctate a `rocky` si no estás ya: `ssh curso@rocky`
+      * Abre el archivo `/etc/sysctl.conf` con `sudo vi` o `sudo nano`:
+        ```bash
+        sudo vi /etc/sysctl.conf
+        ```
+      * Busca la línea `net.ipv4.ip_forward` y asegúrate de que esté configurada a `1`. Si está comentada (con `#`), descoméntala:
+        ```
+        net.ipv4.ip_forward = 1
+        ```
+      * Guarda y cierra el archivo.
+
+2.  **Aplicar los cambios de `sysctl`:**
+
+    ```bash
+    sudo sysctl -p
+    ```
+
+      * Esto cargará la nueva configuración sin necesidad de reiniciar.
+
+3.  **Verificación:**
+
+      * Comprueba que el valor es `1`:
+        ```bash
+        sysctl net.ipv4.ip_forward
+        ```
+        La salida debe ser `net.ipv4.ip_forward = 1`.
+      * **Opcional:** Reinicia el servidor `rocky` (`sudo reboot`) y verifica nuevamente con `sysctl net.ipv4.ip_forward` para confirmar la persistencia.
+
+#### 2\. En `ubuntu` (Ubuntu Server):
+
+**Objetivo:** Añadir una ruta estática a la red `197.10.20.0/24` a través de `rocky` de forma persistente.
+
+**Solución Paso a Paso:**
+
+1.  **Editar el archivo de configuración de Netplan:**
+
+      * Conéctate a `ubuntu` si no estás ya: `ssh curso@ubuntu`
+      * Abre el archivo YAML de Netplan nuevamente:
+        ```bash
+        sudo vi /etc/netplan/00-installer-config.yaml
+        ```
+      * Dentro de la sección de tu interfaz (`enp0s3`), añade una nueva entrada bajo `routes:`. Asegúrate de la indentación correcta.
+        ```yaml
+        network:
+          version: 2
+          renderer: networkd
+          ethernets:
+            enp0s3:
+              dhcp4: no
+              dhcp6: no
+              addresses:
+                - 197.10.10.2/24
+                - 2001:db8:10::2/64
+              routes:
+                - to: default
+                  via: 197.10.10.254
+                - to: default
+                  via: 2001:db8:10::1
+                - to: 197.10.20.0/24 # ¡Nueva ruta!
+                  via: 197.10.10.1   # La IP de rocky en la red compartida
+              nameservers:
+                addresses: [8.8.4.4, 8.8.8.8]
+        ```
+      * Guarda y cierra el archivo.
+
+2.  **Aplicar los cambios de Netplan:**
+
+    ```bash
+    sudo netplan apply
+    ```
+
+3.  **Verificación:**
+
+      * Comprueba la tabla de enrutamiento en `ubuntu`:
+        ```bash
+        ip r
+        ```
+        Deberías ver una línea similar a: `197.10.20.0/24 via 197.10.10.1 dev enp0s3`
+      * Intenta hacer `ping` desde `ubuntu` a la subinterfaz de `rocky`:
+        ```bash
+        ping -c 3 197.10.20.1
+        ```
+        Si todo está configurado correctamente, ¡deberías recibir respuestas\! Esto demuestra que `ubuntu` puede alcanzar la red `197.10.20.0/24` a través de `rocky` (que está reenviando los paquetes).
+
+-----
+
+### Ejercicio 3: Configuración y Verificación de Redes Inalámbricas (Teórico/Simulado)
+
+**Nota:** La ejecución real de estos comandos en servidores virtuales es limitada ya que no suelen tener hardware Wi-Fi. Este ejercicio se centra en el conocimiento de las herramientas y sus funciones.
+
+#### 1\. Identificación de interfaces inalámbricas:
+
+  * **Comando:** `iw dev`
+      * **Salida Esperada (si hay una interfaz inalámbrica):**
+        ```
+        phy#0
+            Interface wlan0
+                ifindex 3
+                wdev 0x1
+                addr 00:11:22:33:44:55
+                ssid MyWiFiNetwork
+                type managed
+                channel 6 (2437 MHz), width 20MHz, center1 2437 MHz
+                txpower 20.00 dBm
+        ```
+        (Muestra el nombre de la interfaz, dirección MAC, etc.)
+  * **Comando:** `iwconfig` (legado)
+      * **Salida Esperada (si hay una interfaz inalámbrica):**
+        ```
+        wlan0     IEEE 802.11  ESSID:"MyWiFiNetwork"
+                  Mode:Managed  Frequency:2.437 GHz  Access Point: 11:22:33:44:55:66
+                  Bit Rate=54 Mb/s   Tx-Power=20 dBm
+                  Retry short limit:7   RTS thr:off   Fragment thr:off
+                  Power Management:on
+                  Link Quality=70/70  Signal level=-30 dBm
+                  Rx invalid nwid:0  Rx invalid crypt:0  Rx invalid frag:0
+                  Tx excessive retries:0  Invalid misc:0   Missed beacon:0
+        ```
+      * **Salida Esperada (si no hay interfaz inalámbrica):**
+        ```
+        lo        no wireless extensions.
+        eth0      no wireless extensions.
+        ```
+        (Indica que las interfaces listadas no tienen capacidades inalámbricas).
+
+#### 2\. Escaneo de redes (simulado):
+
+  * **Comando para escanear redes Wi-Fi disponibles:**
+    ```bash
+    sudo iw dev wlan0 scan # Usando iw (preferido)
+    # O
+    sudo iwlist wlan0 scan # Usando iwlist (legado)
+    ```
+  * **Explicación de la Salida Esperada:**
+      * Ambos comandos listarían las redes inalámbricas detectadas. La salida incluiría:
+          * **SSID (ESSID):** El nombre de la red (ej. "MiRedAbierta", "MiRedSegura").
+          * **Frecuencia/Canal:** La banda y el canal en el que opera la red.
+          * **Protocolo:** Tipo de 802.11 (ej. 802.11g, 802.11n).
+          * **Señal (Signal level):** La fuerza de la señal de la red.
+          * **Modo (Mode):** Generalmente "Managed" para redes de infraestructura (con un AP).
+          * **Cifrado/Seguridad:** Esto es crucial. Indicará si la red está abierta (sin cifrado) o utiliza cifrado (WEP, WPA, WPA2, WPA3). Por ejemplo, verías entradas como `IE: IEEE 802.11i/WPA2 Version 1` para WPA2.
+
+#### 3\. Conexión a una red Wi-Fi (simulado):
+
+  * **Conexión a una red Wi-Fi abierta ("MiRedAbierta"):**
+
+    1.  **Habilitar la interfaz inalámbrica:**
+        ```bash
+        sudo ip link set wlan0 up
+        ```
+    2.  **Conectar a la red (usando `iw`):**
+        ```bash
+        sudo iw dev wlan0 connect MiRedAbierta
+        ```
+    3.  **Obtener dirección IP por DHCP:**
+        ```bash
+        sudo dhclient wlan0
+        # O usar dhclient -v wlan0 para ver el proceso
+        ```
+    4.  **Verificar la IP:**
+        ```bash
+        ip a show wlan0
+        ```
+        Deberías ver una dirección IP asignada.
+
+  * **Conexión a una red Wi-Fi segura (WPA2 - "MiRedSegura"):**
+
+      * Para redes con cifrado WPA/WPA2/WPA3, las utilidades `iw` o `iwconfig` por sí solas no son suficientes para la autenticación compleja. Necesitarías el paquete **`wpa_supplicant`** y herramientas de configuración del sistema de red (como Netplan en Ubuntu o NetworkManager en Rocky).
+
+      * **Utilidades necesarias:**
+
+          * **`wpa_supplicant`:** Un demonio que maneja la autenticación WPA/WPA2/WPA3 para clientes inalámbricos.
+          * **`wpa_cli`:** Una herramienta de línea de comandos para interactuar con `wpa_supplicant`.
+          * **El gestor de red de tu distribución** (Netplan en Ubuntu, NetworkManager en Rocky) para la configuración persistente, que a menudo integra `wpa_supplicant` internamente.
+
+      * **Proceso General (Concepto):**
+
+        1.  **Instalar `wpa_supplicant`** si no está presente.
+        2.  **Configurar `wpa_supplicant`:** Crear o editar un archivo de configuración (típicamente `/etc/wpa_supplicant/wpa_supplicant.conf`) con el SSID y la PSK (contraseña) de la red. Ejemplo de entrada:
+            ```
+            network={
+                ssid="MiRedSegura"
+                psk="SuperSecreta123"
+            }
+            ```
+        3.  **Configurar la interfaz en el gestor de red** (Netplan/NetworkManager) para usar `wpa_supplicant` para la autenticación y obtener la IP por DHCP.
+              * **Netplan (Ubuntu):**
+                ```yaml
+                network:
+                  version: 2
+                  renderer: networkd
+                  wifis:
+                    wlan0: # Tu interfaz Wi-Fi
+                      dhcp4: true
+                      access-points:
+                        "MiRedSegura":
+                          password: "SuperSecreta123"
+                ```
+              * **NetworkManager (`nmcli` en Rocky):**
+                ```bash
+                sudo nmcli dev wifi connect MiRedSegura password "SuperSecreta123" ifname wlan0
+                ```
+        4.  **Habilitar y conectar** la interfaz a través del gestor de red.
+        5.  **Verificar** que se ha obtenido una IP y que hay conectividad.
+
+-----

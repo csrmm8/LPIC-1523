@@ -1,0 +1,52 @@
+MI SCRIPT AUTOMATIZANDO TODO EL PROCESO
+#!/bin/bash
+
+###########################################################################
+
+# Variables globales
+
+FECHA=$(date +%d-%m-%Y)                       	# Fecha del backup
+DESTINO="/backups"                            	# Ruta de destino
+ORIGENES="/etc /home /var/www/html"     	# Archivos a incluir
+USUARIO_MAIL="root@vbox"                    	# Usuario a quien enviar el mail
+
+############################################################################
+
+#Comprobar usuario a ejecutar este script
+[ "$EUID" -ne 0 ] && exit 1
+
+###########################################################################
+
+#Crea el directorio de destino si no existe
+mkdir -p "$DESTINO"
+
+###########################################################################
+
+#Crear backup
+tar -czf "$DESTINO/backup-$FECHA.tar.gz" $ORIGENES
+
+#Comprobar si el backup se creó correctamente
+if [ $? -eq 0 ] && [ -f "$DESTINO/backup-$FECHA.tar.gz" ]; then
+        #Backup creado correctamente, borra backups con mas de 7 días
+        find "$DESTINO" -type f -name "*.tar.gz" -mtime +7 -exec rm -f {} \;
+
+        #Enviar mail de éxito
+        echo "Backup realizado correctamente en $DESTINO/backup-$FECHA.tar.gz" | \
+        mutt -s "Backup existoso $FECHA" $USUARIO_MAIL
+
+else
+        #Enviar mail de fallo
+        echo "ERROR: El backup no se pudo crear en $DESTINO para la fecha $FECHA" | \
+        mutt -s "Backup FALLIDO $FECHA" $USUARIO_MAIL
+
+        #Falló la creación del backup, no borra nada
+        exit 1
+fi
+
+exit 0
+
+###########################################################################
+
+TAREA CRON:
+crontab -l
+26 19 * * * /root/scripts_de_automatizaciones/backups.sh >> /var/log/backups.log 2>&1
