@@ -1,0 +1,10 @@
+﻿Comando / Opción,Formato Corto,Descripción,Ejemplo
+pvcreate,,Inicializa un dispositivo como Physical Volume,sudo pvcreate /dev/sdb1
+pvdisplay,,Muestra información detallada sobre PVs,sudo pvdisplay
+pvs,,Muestra resumen de todos los PVs en una línea,sudo pvs
+pvscan,,Busca todos los dispositivos que contienen PVs,sudo pvscan
+pvremove,,Elimina un Physical Volume (borra la metadata),sudo pvremove /dev/sdb1
+pvmove,,Mueve datos físicos entre PVs (útil para migrar o reemplazar discos),sudo pvmove /dev/sdb1 /dev/sdc1
+--metadatacopies,-m,Número de copias de los metadatos en el PV (usado en pvcreate),sudo pvcreate -m 2 /dev/sdb1
+--pvmetadatacopies,,Cantidad de copias de metadatos al crear VG (en combinación con VG),vgcreate --pvmetadatacopies 2 my_vg /dev/sdb1
+--metadatasize,-s,Tamaño del área de metadatos (en pvcreate),sudo pvcreate -s 256M /dev/sdb1

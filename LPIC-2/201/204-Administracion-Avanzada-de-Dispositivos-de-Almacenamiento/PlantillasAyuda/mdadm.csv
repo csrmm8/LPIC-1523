@@ -1,0 +1,29 @@
+﻿Comando / Opción,Formato,Descripción,Ejemplo de Uso
+--create,-C,Crea un nuevo dispositivo RAID,sudo mdadm --create /dev/md0 --level=1 --raid-devices=2 /dev/sda1 /dev/sdb1
+--assemble,-A,Ensambla un arreglo RAID existente,sudo mdadm --assemble /dev/md0 /dev/sda1 /dev/sdb1
+--build,-B,Construye un arreglo sin metadata (usado raramente),sudo mdadm --build /dev/md0 --level=linear --raid-devices=2 /dev/sda /dev/sdb
+--manage,-M,Gestiona componentes activos de un arreglo,sudo mdadm --manage /dev/md0 --add /dev/sdc1
+--misc,-Y,Modo misceláneo: operaciones sobre componentes individuales,sudo mdadm --misc --detail /dev/sda1
+--monitor,-F,Modo monitorización (envía alertas ante fallos),sudo mdadm --monitor --mail=admin@example.com --delay=300 /dev/md0
+--grow,-G,Cambia el tamaño o propiedades de un arreglo,sudo mdadm --grow /dev/md0 --raid-devices=3
+--incremental,-I,Agrega un disco al arreglo automáticamente,sudo mdadm --incremental /dev/sdc1
+--auto,-a,Crea automáticamente el dispositivo si no existe,sudo mdadm -C /dev/md0 --level=5 --raid-devices=3 /dev/sd[abc]1 -a yes
+--name,-N,"Especifica el nombre del arreglo (útil en RAID 10, por ejemplo)",sudo mdadm --create /dev/md0 --name=myarray --level=1 --raid-devices=2 /dev/sda1 /dev/sdb1
+--uuid,-u,Especifica el UUID del arreglo al ensamblarlo,sudo mdadm --assemble /dev/md0 --uuid=1234abcd:5678efgh:90ijklmn:opqrstuv
+--level,-l,"Nivel de RAID a usar (0, 1, 5, 6, 10, etc.)",sudo mdadm --create /dev/md0 --level=5 --raid-devices=3 /dev/sd[abc]1
+--raid-devices,-n,Número de discos en el arreglo,sudo mdadm --create /dev/md0 --level=1 --raid-devices=2 /dev/sda1 /dev/sdb1
+--spare-devices,-x,Número de discos de repuesto (spare),sudo mdadm --create /dev/md0 --level=5 --raid-devices=3 --spare-devices=1 /dev/sd[abcd]1
+--chunk,-c,"Tamaño del chunk (en KB), usado en RAID 0/4/5/6/10",sudo mdadm --create /dev/md0 --level=0 --raid-devices=2 --chunk=64 /dev/sda1 /dev/sdb1
+--metadata,-e,"Versión de la metadata del superbloque (ej: 0.90, 1.0, 1.1, 1.2)",sudo mdadm --create /dev/md0 --level=1 --raid-devices=2 --metadata=1.2 /dev/sda1 /dev/sdb1
+--add,,Añade un disco a un arreglo ya creado,sudo mdadm --manage /dev/md0 --add /dev/sdc1
+--remove,,Elimina un disco de un arreglo,sudo mdadm --manage /dev/md0 --remove /dev/sdc1
+--fail,-f,Marca un disco como fallido manualmente,sudo mdadm --manage /dev/md0 --fail /dev/sdc1
+--detail,-D,Muestra detalles sobre un arreglo RAID,sudo mdadm --detail /dev/md0
+--examine,-E,Muestra información de un disco individual (superbloque),sudo mdadm --examine /dev/sda1
+--stop,-S,Detiene un arreglo RAID,sudo mdadm --stop /dev/md0
+--run,-R,Fuerza el arranque de un arreglo degradado,sudo mdadm --assemble --run /dev/md0 /dev/sda1 missing
+--readonly,-o,Crea el arreglo en modo solo lectura,sudo mdadm --create /dev/md0 --level=1 --raid-devices=2 --readonly /dev/sda1 /dev/sdb1
+--force,-f,Fuerza operaciones que normalmente serían rechazadas,sudo mdadm --create /dev/md0 --level=1 --raid-devices=2 --force /dev/sda1 /dev/sdb1
+--scan,-s,Escanea /dev para encontrar dispositivos RAID y configurarlos,sudo mdadm --assemble --scan
+--config,-c,Especifica un archivo de configuración personalizado (ej: /etc/mdadm.conf),sudo mdadm --assemble --config=/opt/my-mdadm.conf --scan
+--test,,Usado junto con --monitor para probar alertas,sudo mdadm --monitor --test --mail=admin@example.com /dev/md0

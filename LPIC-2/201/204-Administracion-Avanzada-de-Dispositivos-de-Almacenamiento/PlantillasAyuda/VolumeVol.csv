@@ -1,0 +1,13 @@
+﻿Comando / Opción,Formato Corto,Descripción,Ejemplo
+vgcreate,,Crea un nuevo Volume Group a partir de uno o más PVs,sudo vgcreate my_vg /dev/sdb1
+vgdisplay,,Muestra información detallada sobre VGs,sudo vgdisplay my_vg
+vgs,,Muestra resumen de todos los VGs en una línea,sudo vgs
+vgscan,,Escanea y muestra los VGs existentes,sudo vgscan
+vgextend,,Añade un PV a un VG existente,sudo vgextend my_vg /dev/sdc1
+vgreduce,,Elimina un PV de un VG (si no tiene LVs activos),sudo vgreduce my_vg /dev/sdc1
+vgchange,-c,Cambia el estado de un VG (activar/desactivar),sudo vgchange -a y my_vg
+vgremove,,Elimina un VG (debe estar vacío),sudo vgremove my_vg
+vgrename,,Renombra un VG,sudo vgrename my_vg new_vg
+--maxlogicalvolumes,-l,Establece el número máximo de LVs permitidos en el VG,sudo vgcreate -l 200 my_vg /dev/sdb1
+--maxphysicalvolumes,-p,Máximo número de PVs permitidos en el VG,sudo vgcreate -p 10 my_vg /dev/sdb1
+--physicalextentsize,-s,Tamaño del extent físico (unidad básica de asignación),sudo vgcreate -s 4M my_vg /dev/sdb1

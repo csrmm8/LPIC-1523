@@ -1,0 +1,17 @@
+﻿Comando / Opción,Formato Corto,Descripción,Ejemplo
+lvcreate,,Crea un nuevo Logical Volume dentro de un VG,sudo lvcreate -n my_lv -L 10G my_vg
+lvdisplay,,Muestra detalles sobre un LV,sudo lvdisplay /dev/my_vg/my_lv
+lvs,,Muestra resumen de todos los LVs en una línea,sudo lvs
+lvscan,,Escanea y muestra los LVs activos e inactivos,sudo lvscan
+lvextend,-L,Extiende el tamaño de un LV,sudo lvextend -L +5G /dev/my_vg/my_lv
+lvreduce,-L,"Reduce el tamaño de un LV (con cuidado, puede perder datos)",sudo lvreduce -L -2G /dev/my_vg/my_lv
+lvresize,,Cambia el tamaño de un LV (tanto extender como reducir),sudo lvresize -L 15G /dev/my_vg/my_lv
+lvremove,,Elimina un LV (debe estar desmontado y desactivado),sudo lvremove /dev/my_vg/my_lv
+lvrename,,Renombra un LV,sudo lvrename my_vg old_lv new_lv
+lvchange,-a,Activa o desactiva un LV,sudo lvchange -a n /dev/my_vg/my_lv
+--stripes,-i,Número de stripes (franjas) para distribuir datos en varios PVs,sudo lvcreate -i 2 -I 64 -L 10G -n striped_lv my_vg
+--stripesize,-I,Tamaño de cada franja en KB (usado con --stripes),sudo lvcreate -i 2 -I 32 -L 10G my_vg
+--type mirror,,Crea un LV con espejo (mirroring),sudo lvcreate --type mirror -m 1 -L 5G -n mirrored_lv my_vg
+--thinpool,,Crea un pool de almacenamiento delgado,sudo lvcreate -T -n thin_pool my_vg -L 20G
+--thin,,Crea un volumen delgado desde un thin pool,sudo lvcreate -T my_vg/thin_pool -V 5G -n thin_lv
+--snapshot,,Crea una instantánea (snapshot) de un LV,sudo lvcreate --size 2G --snapshot --name snap_lv /dev/my_vg/my_lv
