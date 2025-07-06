@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de Máscaras de Red</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .error-message {
+            color: #d9534f;
+            margin-top: 5px;
+            font-size: 0.9em;
+            height: 18px; /* Para mantener el espacio y evitar saltos de diseño */
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Conversor de Máscaras de Red</h1>
+
+        <div class="input-group">
+            <label for="decimalInput">Máscara Decimal (ej: 255.255.255.0)</label>
+            <input type="text" id="decimalInput" placeholder="Ej: 255.255.255.0" onkeyup="convertFromDecimal()">
+            <span id="decimalError" class="error-message"></span>
+        </div>
+
+        <div class="input-group">
+            <label for="binaryInput">Máscara Binaria (ej: 11111111.11111111.11111111.00000000)</label>
+            <input type="text" id="binaryInput" placeholder="Ej: 11111111.11111111.11111111.00000000" onkeyup="convertFromBinary()">
+            <span id="binaryError" class="error-message"></span>
+        </div>
+
+        <div class="input-group">
+            <label for="cidrInput">Máscara CIDR (ej: /24)</label>
+            <input type="text" id="cidrInput" placeholder="Ej: /24" onkeyup="convertFromCidr()">
+            <span id="cidrError" class="error-message"></span>
+        </div>
+    </div>
+
+    <script>
+        // Referencias a los elementos del DOM
+        const decimalInput = document.getElementById('decimalInput');
+        const binaryInput = document.getElementById('binaryInput');
+        const cidrInput = document.getElementById('cidrInput');
+        const decimalError = document.getElementById('decimalError');
+        const binaryError = document.getElementById('binaryError');
+        const cidrError = document.getElementById('cidrError');
+
+        // Función para limpiar errores y campos
+        function clearErrorsAndFields(exceptId = null) {
+            decimalError.textContent = '';
+            binaryError.textContent = '';
+            cidrError.textContent = '';
+
+            if (exceptId !== 'decimalInput') decimalInput.value = '';
+            if (exceptId !== 'binaryInput') binaryInput.value = '';
+            if (exceptId !== 'cidrInput') cidrInput.value = '';
+        }
+
+        // --- Conversión desde Decimal ---
+        function convertFromDecimal() {
+            const input = decimalInput.value.trim();
+            if (input === '') {
+                clearErrorsAndFields('decimalInput');
+                return;
+            }
+
+            // Validar formato decimal
+            const octets = input.split('.');
+            if (octets.length !== 4) {
+                decimalError.textContent = 'Formato decimal inválido.';
+                clearOtherFields('decimalInput');
+                return;
+            }
+
+            let binaryMask = '';
+            for (let i = 0; i < 4; i++) {
+                const octet = parseInt(octets[i], 10);
+                if (isNaN(octet) || octet < 0 || octet > 255) {
+                    decimalError.textContent = 'Octeto inválido (0-255).';
+                    clearOtherFields('decimalInput');
+                    return;
+                }
+                binaryMask += octet.toString(2).padStart(8, '0');
+            }
+
+            // Validar que la máscara sea contigua (solo 1s seguidos de 0s)
+            if (!isValidMask(binaryMask)) {
+                decimalError.textContent = 'Máscara decimal no válida (no contigua).';
+                clearOtherFields('decimalInput');
+                return;
+            }
+
+            decimalError.textContent = ''; // Limpiar errores si todo es válido
+            updateFields(binaryMask, 'decimalInput');
+        }
+
+        // --- Conversión desde Binario ---
+        function convertFromBinary() {
+            const input = binaryInput.value.trim();
+            if (input === '') {
+                clearErrorsAndFields('binaryInput');
+                return;
+            }
+
+            // Eliminar puntos para validación y procesamiento
+            const rawBinary = input.replace(/\./g, '');
+
+            if (rawBinary.length !== 32 || !/^[01]+$/.test(rawBinary)) {
+                binaryError.textContent = 'Formato binario inválido (32 bits de 0s y 1s).';
+                clearOtherFields('binaryInput');
+                return;
+            }
+
+            // Validar que la máscara sea contigua
+            if (!isValidMask(rawBinary)) {
+                binaryError.textContent = 'Máscara binaria no válida (no contigua).';
+                clearOtherFields('binaryInput');
+                return;
+            }
+
+            binaryError.textContent = ''; // Limpiar errores
+            updateFields(rawBinary, 'binaryInput');
+        }
+
+        // --- Conversión desde CIDR ---
+        function convertFromCidr() {
+            const input = cidrInput.value.trim();
+            if (input === '') {
+                clearErrorsAndFields('cidrInput');
+                return;
+            }
+
+            let cidrValue = input;
+            if (cidrValue.startsWith('/')) {
+                cidrValue = cidrValue.substring(1);
+            }
+
+            const prefix = parseInt(cidrValue, 10);
+
+            if (isNaN(prefix) || prefix < 0 || prefix > 32) {
+                cidrError.textContent = 'CIDR inválido (0-32).';
+                clearOtherFields('cidrInput');
+                return;
+            }
+
+            const binaryMask = '1'.repeat(prefix) + '0'.repeat(32 - prefix);
+            cidrError.textContent = ''; // Limpiar errores
+            updateFields(binaryMask, 'cidrInput');
+        }
+
+        // --- Funciones Auxiliares ---
+
+        // Valida si la máscara binaria es contigua (solo 1s seguidos de 0s)
+        function isValidMask(binaryString) {
+            const firstZero = binaryString.indexOf('0');
+            const lastOne = binaryString.lastIndexOf('1');
+
+            // Si no hay ceros o no hay unos, es válida (ej: /32 o /0)
+            if (firstZero === -1 || lastOne === -1) {
+                return true;
+            }
+            // Si el primer cero aparece después del último uno, es válida.
+            // Esto significa que todos los unos están a la izquierda de todos los ceros.
+            return firstZero >= lastOne;
+        }
+
+        // Actualiza los otros campos basado en la máscara binaria de 32 bits
+        function updateFields(binaryMask, sourceId) {
+            // Conversión a Decimal
+            let decimalResult = '';
+            for (let i = 0; i < 32; i += 8) {
+                const octetBinary = binaryMask.substring(i, i + 8);
+                decimalResult += parseInt(octetBinary, 2) + (i < 24 ? '.' : '');
+            }
+
+            // Conversión a Binario (formateado con puntos)
+            let formattedBinary = '';
+            for (let i = 0; i < 32; i += 8) {
+                formattedBinary += binaryMask.substring(i, i + 8) + (i < 24 ? '.' : '');
+            }
+
+            // Conversión a CIDR
+            const cidrResult = '/' + (binaryMask.split('1').length - 1); // Cuenta los '1's
+
+            // Actualizar solo los campos que no son la fuente
+            if (sourceId !== 'decimalInput') {
+                decimalInput.value = decimalResult;
+            }
+            if (sourceId !== 'binaryInput') {
+                binaryInput.value = formattedBinary;
+            }
+            if (sourceId !== 'cidrInput') {
+                cidrInput.value = cidrResult;
+            }
+        }
+
+        // Limpia los campos que no son el campo de origen
+        function clearOtherFields(sourceId) {
+            if (sourceId !== 'decimalInput') decimalInput.value = '';
+            if (sourceId !== 'binaryInput') binaryInput.value = '';
+            if (sourceId !== 'cidrInput') cidrInput.value = '';
+        }
+
+        // Al cargar la página, limpia todos los campos y errores.
+        window.onload = () => {
+            clearErrorsAndFields();
+        };
+
+    </script>
+</body>
+</html>
